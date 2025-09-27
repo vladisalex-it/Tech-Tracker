@@ -16,26 +16,10 @@
 <div class="container">
     <h2 class="heading">Ваш прогресс</h2>
     <div class="progress">
-        <div class="progress-bar"></div>
+        <div id="progress" class="progress-bar"></div>
     </div>
 
-    <div class="row">
-        <div class="card">
-            <h3>HTML</h3>
-        </div>
-        <div class="card">
-            <h3>CSS</h3>
-        </div>
-        <div class="card">
-            <h3>JavaScript</h3>
-        </div>
-        <div class="card">
-            <h3>Git</h3>
-        </div>
-        <div class="card">
-            <h3>React</h3>
-        </div>
-    </div>
+    <div id="content" class="row"></div>
 
     <form class="form">
         <h2 class="heading">Добавить технологию</h2>
@@ -47,20 +31,20 @@
             <label for="description">Название</label>
             <input type="text" id="description" name="description" placeholder="Введите описание">
         </div>
-        <button type="submit" class="btn">Создать</button>
+        <button type="button" class="btn">Создать</button>
     </form>
 </div>
 
-<div class="modal">
+<div id="modal" class="modal">
     <h2>JavaScript</h2>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo minima quaerat eligendi mollitia alias deserunt repellendus dolores blanditiis ut, necessitatibus ipsum delectus. Deleniti minus mollitia qui vitae harum quos nulla!Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo minima quaerat eligendi mollitia alias deserunt repellendus dolores blanditiis ut, necessitatibus ipsum delectus. Deleniti minus mollitia qui vitae harum quos nulla!Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo minima quaerat eligendi mollitia alias deserunt repellendus dolores blanditiis ut, necessitatibus ipsum delectus. Deleniti minus mollitia qui vitae harum quos nulla!</p>
+    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
     <hr>
     <div>
         <input type="checkbox" id="done">
         <label for="done">Выучил</label>
     </div>
 </div>
-<div class="modal-backdrop"></div>
+<div id="backdrop" class="modal-backdrop"></div>
     
 <script src="js/script.js"></script>
 </body>
