@@ -1,4 +1,5 @@
 const modalElement = document.querySelector('#modal')
+const checkBoxElement = document.querySelector('#done')
 const contentElement = document.querySelector('#content')
 const backdropElement = document.querySelector('#backdrop')
 const progress = document.querySelector('#progress')
@@ -7,7 +8,10 @@ const inputDescriptionElement = document.querySelector('#description')
 const buttonElement = document.querySelector('.btn')
 
 backdropElement.addEventListener('click', closeModal)
-contentElement.addEventListener('click', openCard)
+function processChildren() {
+    const childrenArray = Array.from(contentElement.children);
+    childrenArray.forEach(child => child.addEventListener('click', openCard));
+}
 
 const technologies = [
     {title: 'HTML', description: 'HTML Text', type: 'html', done: true},
@@ -17,6 +21,26 @@ const technologies = [
     {title: 'React', description: 'React Text', type: 'react', done: false},
 ]
 
+checkBoxElement.addEventListener('change', function(event) {
+    console.log(event.target.closest('.card'))
+    if (this.checked) {
+        technologies.forEach(element => {
+            if (element.done === false) {
+                element.done = true
+            }
+        });
+        setTimeout(() => {
+             closeModal()
+        }, 1000)
+    } else {
+        technologies.forEach(element => {
+            if (element.done) {
+                element.done = false
+            }
+        });
+    }
+    init()
+})
 
 function openCard() {
     modalElement.classList.add('open')
@@ -29,6 +53,7 @@ function closeModal() {
 function init() {
     renderCards()
     renderProgress()
+    processChildren()
 }
 
 function renderCards() {
@@ -43,6 +68,15 @@ function renderCards() {
         }
         // contentElement.innerHTML = technologies.map(toCard).join('')
     }
+}
+
+function toCard(tech) {
+    const doneClass = tech.done === true ? 'done' : ''
+    return `
+        <div class="card ${doneClass}">
+            <h3>${tech.title}</h3>
+        </div>
+    ` 
 }
 
 function renderProgress() {
@@ -85,14 +119,7 @@ function computeProgressPercent() {
 
 init()
 
-function toCard(tech) {
-    const doneClass = tech.done === true ? 'done' : ''
-    return `
-        <div class="card ${doneClass}">
-            <h3>${tech.title}</h3>
-        </div>
-    ` 
-}
+
 
 
 
