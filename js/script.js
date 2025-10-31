@@ -1,82 +1,79 @@
 const modalElement = document.querySelector('#modal')
-const checkBoxElement = document.querySelector('#done')
 const contentElement = document.querySelector('#content')
 const backdropElement = document.querySelector('#backdrop')
 const progress = document.querySelector('#progress')
-const inputTitleElement = document.querySelector('#title')
-const inputDescriptionElement = document.querySelector('#description')
-const buttonElement = document.querySelector('.btn')
+const formElement = document.querySelector('#form')
 
+formElement.addEventListener('submit', createTech)
+
+contentElement.addEventListener('click', openCard)
 backdropElement.addEventListener('click', closeModal)
-function processChildren() {
-    const childrenArray = Array.from(contentElement.children);
-    childrenArray.forEach(child => child.addEventListener('click', openCard));
+modalElement.addEventListener('change', toggleTech)
+
+const APP_TITLE = document.title
+const LS_KEY = 'MY_TECHS'
+
+const technologies = getState()
+
+function toggleTech(event) {
+    const targetType = event.target.dataset.type
+    const currentTech = technologies.find((t) => t.type === `${targetType}`)
+    currentTech.done = event.target.checked
+    
+    saveState()
+    init()
 }
 
-const technologies = [
-    {title: 'HTML', description: 'HTML Text', type: 'html', done: true},
-    {title: 'CSS', description: 'CSS Text', type: 'css', done: true},
-    {title: 'JavaScript', description: 'JavaScript Text', type: 'js', done: false},
-    {title: 'Git', description: 'Git Text', type: 'git', done: false},
-    {title: 'React', description: 'React Text', type: 'react', done: false},
-]
+function openCard(event) {
+    const data = event.target.dataset
+    const tech = technologies.find((tech) => tech.type === data.type)
+    if (!tech) return
+    openModal(toModal(tech), tech.title)
+}
 
-checkBoxElement.addEventListener('change', function(event) {
-    console.log(event.target.closest('.card'))
-    if (this.checked) {
-        technologies.forEach(element => {
-            if (element.done === false) {
-                element.done = true
-            }
-        });
-        setTimeout(() => {
-             closeModal()
-        }, 1000)
-    } else {
-        technologies.forEach(element => {
-            if (element.done) {
-                element.done = false
-            }
-        });
-    }
-    init()
-})
+function toModal(tech) {
+    const checked = tech.done ? 'checked' : ''
+    return `
+        <h2>${tech.title}</h2>
+        <p>${tech.description}</p>
+        <hr>
+        <div>
+            <input type="checkbox" id="done" ${checked} data-type="${tech.type}">
+            <label for="done">Выучил</label>
+        </div>
+    `
+}
 
-function openCard() {
+function openModal(html, title = APP_TITLE) {
+    document.title = `${title} | ${APP_TITLE}`
     modalElement.classList.add('open')
+    modalElement.innerHTML = html
+
 }
 
 function closeModal() {
+    document.title = APP_TITLE
     modalElement.classList.remove('open')
 }
 
 function init() {
     renderCards()
     renderProgress()
-    processChildren()
 }
 
 function renderCards() {
-    if (technologies.length === 0) {
-        contentElement.innerHTML = '<p>Технологий пока нет. Добавьте новую</p>'
-    } else {
-        let html = ''
-        for (let i = 0; i < technologies.length; i++) {
-            const tech = technologies[i]
-            html += toCard(tech)
-        contentElement.innerHTML = html
-        }
-        // contentElement.innerHTML = technologies.map(toCard).join('')
-    }
+    contentElement.innerHTML = technologies.length === 0 
+        ? '<p class="empty">Технологий пока нет. Добавьте новую</p>'
+        : technologies.map(toCard).join('')
 }
 
 function toCard(tech) {
     const doneClass = tech.done === true ? 'done' : ''
     return `
-        <div class="card ${doneClass}">
-            <h3>${tech.title}</h3>
+        <div class="card ${doneClass}" data-type="${tech.type}">
+            <h3 data-type="${tech.type}">${tech.title}</h3>
         </div>
-    ` 
+    `
 }
 
 function renderProgress() {
@@ -87,8 +84,9 @@ function renderProgress() {
         progressText = document.createElement('span')
         progressTitle.append(progressText)
     }
-    progressText.textContent = ` ${percent}%`
-    
+    progressText.textContent = percent ? percent + '%' : ''
+    progressText.style.marginLeft = '6px'
+
     let background
     if (percent < 30) {
         background = '#E75A5A'
@@ -101,46 +99,58 @@ function renderProgress() {
     progress.style.width = percent + '%'
     progress.textContent = percent ? percent + '%' : ''
     progress.style.textAlign = 'center'
-    console.log(percent)
 }
 
 function computeProgressPercent() {
     if (technologies.length === 0) {
         return 0
     }
-    let downCount = 0
-    for (let i = 0; i < technologies.length; i++) {
-        if (technologies[i].done) {
-            downCount += 1
-        }
+    let donwCount = technologies.filter((tech) => tech.done).length
+    return Math.round((donwCount / technologies.length) * 100)
+}
+
+function isInvalid(title, description) {
+    return !title.value || !description.value
+}
+
+function createTech(event) {
+    event.preventDefault()
+    const { title, description } = event.target
+
+    if (isInvalid(title, description)) {
+        if (!title.value) title.classList.add('invalid')
+        if (!description.value) description.classList.add('invalid')
+
+        setTimeout(() => {
+            title.classList.remove('invalid')
+            description.classList.remove('invalid')
+        }, 2000)
+        return
     }
-    return Math.round(100 * (downCount / technologies.length))
+    
+    const newTech = {
+        title: title.value,
+        description: description.value,
+        type: title.value.toLowerCase(),
+        done: false
+    }
+    technologies.push(newTech)
+    saveState()
+    title.value = ''
+    description.value = ''
+    init()
+}
+
+function saveState() {
+    localStorage.setItem(LS_KEY, JSON.stringify(technologies))
+}
+
+function getState() {
+    const raw = localStorage.getItem(LS_KEY)
+    return raw ? JSON.parse(raw) : []
 }
 
 init()
-
-
-
-
-
-
-buttonElement.addEventListener('click', function() {
-    const inputtitleValue = inputTitleElement.value
-    const inputDescriptionValue = inputDescriptionElement.value
-
-    if (inputDescriptionValue.trim() === '' || inputtitleValue.trim() === '') {
-        alert('не всё заполнено')
-    } else {
-        technologies.push({title: `${inputtitleValue}`, description: `${inputDescriptionValue}`, type: `${inputtitleValue}`, done: true})
-
-    init()
-    console.log(technologies)
-    }
-
-    
-})
-
-
 
 
 

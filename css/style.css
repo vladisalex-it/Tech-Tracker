@@ -108,7 +108,7 @@ input::placeholder {
     height: 30px;
     border: var(--border);
     border-radius: var(--radios);
-    
+    transition: width .3s ease-in-out;
 }
 
 .progress-value {
