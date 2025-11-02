@@ -1,17 +1,22 @@
+const APP_TITLE = document.title
+const LS_KEY = 'MY_TECHS'
+
 const modalElement = document.querySelector('#modal')
 const contentElement = document.querySelector('#content')
 const backdropElement = document.querySelector('#backdrop')
 const progress = document.querySelector('#progress')
 const formElement = document.querySelector('#form')
+const deleteCardBtnElement = document.querySelector('#deleteCardButton')
 
 formElement.addEventListener('submit', createTech)
-
 contentElement.addEventListener('click', openCard)
 backdropElement.addEventListener('click', closeModal)
 modalElement.addEventListener('change', toggleTech)
 
-const APP_TITLE = document.title
-const LS_KEY = 'MY_TECHS'
+
+// function deleteTech(event) {
+//     console.log(event.target)
+// }
 
 const technologies = getState()
 
@@ -19,16 +24,26 @@ function toggleTech(event) {
     const targetType = event.target.dataset.type
     const currentTech = technologies.find((t) => t.type === `${targetType}`)
     currentTech.done = event.target.checked
-    
+
     saveState()
     init()
 }
 
 function openCard(event) {
+    const isDeleteClick = event.target.matches('#deleteCardButton')
+    if (isDeleteClick) {
+        const targetType = event.target.parentElement.dataset.type
+        const idx = technologies.findIndex((t) => t.type === targetType)
+        if (idx !== -1) technologies.splice(idx, 1)
+        init()
+        saveState()
+    }
     const data = event.target.dataset
     const tech = technologies.find((tech) => tech.type === data.type)
     if (!tech) return
     openModal(toModal(tech), tech.title)
+
+
 }
 
 function toModal(tech) {
@@ -39,6 +54,7 @@ function toModal(tech) {
         <hr>
         <div>
             <input type="checkbox" id="done" ${checked} data-type="${tech.type}">
+            
             <label for="done">Выучил</label>
         </div>
     `
@@ -62,15 +78,20 @@ function init() {
 }
 
 function renderCards() {
-    contentElement.innerHTML = technologies.length === 0 
+    contentElement.innerHTML = technologies.length === 0
         ? '<p class="empty">Технологий пока нет. Добавьте новую</p>'
         : technologies.map(toCard).join('')
+
+
+
 }
 
 function toCard(tech) {
     const doneClass = tech.done === true ? 'done' : ''
     return `
         <div class="card ${doneClass}" data-type="${tech.type}">
+            <button id="deleteCardButton" type="button" style="display: inline-flex;" class="card__close" aria-label="Close">×</button>
+
             <h3 data-type="${tech.type}">${tech.title}</h3>
         </div>
     `
@@ -127,19 +148,22 @@ function createTech(event) {
         }, 2000)
         return
     }
-    
+
     const newTech = {
         title: title.value,
         description: description.value,
         type: title.value.toLowerCase(),
         done: false
     }
+
     technologies.push(newTech)
     saveState()
     title.value = ''
     description.value = ''
     init()
 }
+
+
 
 function saveState() {
     localStorage.setItem(LS_KEY, JSON.stringify(technologies))
