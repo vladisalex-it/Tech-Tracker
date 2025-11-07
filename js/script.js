@@ -14,11 +14,27 @@ backdropElement.addEventListener('click', closeModal)
 modalElement.addEventListener('change', toggleTech)
 
 
-// function deleteTech(event) {
-//     console.log(event.target)
-// }
+const javaScriptText = `JavaScript (JS) — интерпретируемый язык программирования высокого уровня, который в основном используется для создания интерактивных веб-страниц и веб-приложений. Часто в текстах и обучающих материалах название языка сокращают до JS. otus.ru blog.skillfactory.ru digitalocean.ru Простыми словами, JavaScript — язык скриптов или сценариев, который выполняется при загрузке веб-страницы. Скрипты можно прописать внутри кода страницы или подключить к HTML отдельным файлом.`
 
-const technologies = getState()
+const reactText = `React (иногда React.js или ReactJS) — JavaScript-библиотека с открытым исходным кодом для разработки пользовательских интерфейсов. Разработана Facebook, поддерживается сообществом разработчиков. Основная идея: создавать небольшие, независимые компоненты, которые затем объединяются для построения более сложных интерфейсов. Каждый компонент — это законченная часть веб-приложения, которая может быть повторно использована в других частях приложения или в других проектах.`
+
+const nodeJsText = `Node или Node.js - программная платформа, основанная на движке V8 (компилирующем JavaScript в машинный код), превращающая JavaScript из узкоспециализированного языка в язык общего назначения. Node.js добавляет возможность JavaScript взаимодействовать с устройствами ввода-вывода через свой API, написанный на C++, подключать другие внешние библиотеки, написанные на разных языках, обеспечивая вызовы к ним из JavaScript-кода. Node.js применяется преимущественно на сервере, выполняя роль веб-сервера, но есть возможность разрабатывать на Node.js и десктопные оконные приложения.`
+
+const initialStaticTechnologies = [
+  { title: 'JavaScript', description: `${javaScriptText}`, type: 'html', done: true },
+  { title: 'React', description: `${reactText}`, type: 'css', done: true },
+  { title: 'Node.js', description: `${nodeJsText}`, type: 'javascript', done: false }
+];
+let technologies = getState()
+
+if (technologies.length === 0) {
+  technologies = initialStaticTechnologies;
+  saveState(technologies);
+  console.log("LocalStorage был пуст, инициализирован статическими данными.");
+} else {
+  console.log("LocalStorage уже содержит данные.");
+}
+
 
 function toggleTech(event) {
     const targetType = event.target.dataset.type
@@ -42,8 +58,6 @@ function openCard(event) {
     const tech = technologies.find((tech) => tech.type === data.type)
     if (!tech) return
     openModal(toModal(tech), tech.title)
-
-
 }
 
 function toModal(tech) {
@@ -81,9 +95,6 @@ function renderCards() {
     contentElement.innerHTML = technologies.length === 0
         ? '<p class="empty">Технологий пока нет. Добавьте новую</p>'
         : technologies.map(toCard).join('')
-
-
-
 }
 
 function toCard(tech) {
@@ -162,8 +173,6 @@ function createTech(event) {
     description.value = ''
     init()
 }
-
-
 
 function saveState() {
     localStorage.setItem(LS_KEY, JSON.stringify(technologies))
